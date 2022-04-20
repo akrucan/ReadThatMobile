@@ -8,11 +8,11 @@
 </script>
 
 <template>
-    <img alt="Vue logo" src="./assets/logo.png" />
+    <img alt="Read That logo" src="/favicon.svg" />
     <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
 </template>
 
-<style>
+<style lang="scss">
     #app {
         font-family: Avenir, Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
