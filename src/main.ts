@@ -1,15 +1,23 @@
-import { createApp, defineAsyncComponent } from "vue";
-import App from "./App.vue";
+import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
+import { createPinia } from "pinia";
+import App from "./ui/App.vue";
 
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
             path: "/",
-            component: defineAsyncComponent(() => import("./components/HelloWorld.vue")),
+            component: () => import("./ui/components/HelloWorld.vue"),
+        },
+        {
+            path: "/login",
+            component: () => import("./ui/screens/SignInScreen.vue"),
         },
     ],
 });
 
-createApp(App).use(router).mount("#app");
+createApp(App)
+    .use(router)
+    .use(createPinia())
+    .mount("#app");
