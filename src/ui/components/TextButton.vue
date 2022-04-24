@@ -1,13 +1,11 @@
 <script setup lang="ts">
-    import { defineProps } from "vue";
-
-    defineProps({
-        onClick: Function
-    });
+    defineProps<{
+        onClick: (() => void) | Promise<void>
+    }>();
 </script>
 
 <template>
-    <button type="submit" @click.prevent="onClick()">
+    <button type="submit" @click="onClick">
         <slot></slot>
     </button>
 </template>
@@ -22,5 +20,9 @@
         border-radius: 24px;
         font-weight: 500;
         padding: 0.5rem 1rem;
+
+        &:hover {
+            cursor: pointer;
+        }
     }
 </style>

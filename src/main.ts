@@ -8,12 +8,19 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            component: () => import("./ui/components/HelloWorld.vue"),
+            name: "Home",
+            component: () => import("./ui/screens/HomeScreen.vue"),
         },
         {
-            path: "/login",
+            path: "/signin",
+            name: "SignIn",
             component: () => import("./ui/screens/SignInScreen.vue"),
         },
+        {
+            path: "/signup",
+            name: "SignUp",
+            component: () => import("./ui/screens/SignUpScreen.vue")
+        }
     ],
 });
 

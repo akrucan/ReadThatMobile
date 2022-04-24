@@ -1,24 +1,28 @@
 <script setup lang="ts">
     import { reactive, toRaw } from "vue";
-    import { AuthProvider, useUserStore } from "../../stores/user";
     import { useRouter } from "vue-router";
-    import TextField from "../components/TextField.vue";
+    import { useUserStore } from "../../stores/user";
     import TextButton from "../components/TextButton.vue";
+    import TextField from "../components/TextField.vue";
 
     const router = useRouter();
     const userStore = useUserStore();
 
     const credentials = reactive({
         email: "",
+        nickname: "",
         password: "",
     });
 
-    function onSignIn() {
-        console.log(toRaw(credentials));
-    }
+    async function onSignUp() {
+        const cred = toRaw(credentials);
 
-    async function onSignInWithProvider(provider: AuthProvider) {
-        const isSuccess = await userStore.signInWithProvider(provider);
+        const emailRegex = /[a-z\d][a-z\d-_.]*[a-z\d]+@[a-z\d][a-z\d-_.]*[a-z\d]\.[a-z]{2,}/gi;
+        if (!emailRegex.test(cred.email)) return;
+        if (cred.nickname.length < 3) return;
+        if (cred.password.length < 8) return;
+
+        const isSuccess = await userStore.signUpWithEmail(cred.email, cred.nickname, cred.password);
         if (isSuccess) {
             await router.replace({ name: "Home" });
         }
@@ -28,14 +32,21 @@
 <template>
     <h1>Enter your credentials to sign in</h1>
 
-    <section id="signin-form">
+    <section id="signup-form">
         <div>
-            <form action="#" @submit.prevent="onSignIn">
+            <form action="#" @submit.prevent="onSignUp">
                 <label for="email">Email</label>
                 <TextField
                     id="email"
                     type="email"
                     v-model:value="credentials.email"
+                />
+
+                <label for="nickname">Nickname</label>
+                <TextField
+                    id="nickname"
+                    type="text"
+                    v-model:value="credentials.nickname"
                 />
 
                 <label for="password">Password</label>
@@ -45,25 +56,19 @@
                     v-model:value="credentials.password"
                 />
 
-                <TextButton id="signin-button" :onClick="() => {}">Sign In</TextButton>
+                <TextButton id="signup-button" :onClick="() => {}">Sign Up</TextButton>
             </form>
-
-            <p id="signup-text">Don't have an account?
-                <router-link
-                    id="signup-link"
-                    :to="{ name: 'SignUp', replace: true }"
-                >
-                    Sign Up
-                </router-link>
-            </p>
         </div>
     </section>
 
-    <section id="alternative-signup-methods">
-        <TextButton :onClick="onSignInWithProvider('google')">Sign in with Google</TextButton>
-        <TextButton :onClick="onSignInWithProvider('github')">Sign in with GitHub</TextButton>
-        <TextButton :onClick="() => {}">Sign in with Facebook</TextButton>
-    </section>
+    <p id="signin-text">Already have an account?
+        <router-link
+            id="signin-link"
+            :to="{ name: 'SignIn', replace: true }"
+        >
+            Sign In
+        </router-link>
+    </p>
 </template>
 
 <style scoped lang="scss">
@@ -77,7 +82,7 @@
         font-weight: 400;
     }
 
-    #signin-form {
+    #signup-form {
         flex-grow: 1;
         display: flex;
         flex-direction: column;
@@ -97,33 +102,17 @@
         }
     }
 
-    label {
-        margin-bottom: 0.5rem;
-    }
-
-    #signin-button {
+    #signup-button {
         align-self: flex-end;
     }
 
-    #signup-text {
+    #signin-text {
         font-weight: 500;
         text-align: center;
+        margin-bottom: 5rem;
     }
 
-    #signup-link {
+    #signin-link {
         color: $primary;
-    }
-
-    #alternative-signup-methods {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 3rem;
-
-        button {
-            background-color: $secondaryContainer;
-            color: $onSecondaryContainer;
-        }
     }
 </style>

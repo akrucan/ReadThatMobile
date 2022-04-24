@@ -3,7 +3,7 @@
 </script>
 
 <template>
-    <router-link to="/login">Login</router-link>
+    <router-link to="/signin">Sign In</router-link>
 </template>
 
 <style scoped lang="scss">
