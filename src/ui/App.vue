@@ -48,6 +48,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
 
         > header {
             display: flex;
