@@ -62,7 +62,6 @@
     <section id="alternative-signup-methods">
         <TextButton @click="onSignInWithProvider('google')">Sign in with Google</TextButton>
         <TextButton @click="onSignInWithProvider('github')">Sign in with GitHub</TextButton>
-        <TextButton>Sign in with Facebook</TextButton>
     </section>
 </template>
 
