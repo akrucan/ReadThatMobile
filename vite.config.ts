@@ -7,7 +7,9 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                additionalData: `@import "./src/ui/theme/colors";`,
+                additionalData: `
+                    @use "sass:color";
+                    @import "./src/ui/theme/colors";`,
             },
         },
         modules: {
