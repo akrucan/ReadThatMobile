@@ -1,11 +1,11 @@
 <script setup lang="ts">
-    defineProps<{
-        onClick: (() => void) | Promise<void>
+    const emit = defineEmits<{
+        (e: "click"): void
     }>();
 </script>
 
 <template>
-    <button type="submit" @click="onClick">
+    <button type="submit" @click.prevent="emit('click')">
         <slot></slot>
     </button>
 </template>

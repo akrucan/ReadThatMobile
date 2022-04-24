@@ -56,7 +56,7 @@
                     v-model:value="credentials.password"
                 />
 
-                <TextButton id="signup-button" :onClick="() => {}">Sign Up</TextButton>
+                <TextButton id="signup-button">Sign Up</TextButton>
             </form>
         </div>
     </section>

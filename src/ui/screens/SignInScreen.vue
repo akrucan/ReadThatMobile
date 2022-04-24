@@ -45,7 +45,7 @@
                     v-model:value="credentials.password"
                 />
 
-                <TextButton id="signin-button" :onClick="() => {}">Sign In</TextButton>
+                <TextButton id="signin-button">Sign In</TextButton>
             </form>
 
             <p id="signup-text">Don't have an account?
@@ -60,9 +60,9 @@
     </section>
 
     <section id="alternative-signup-methods">
-        <TextButton :onClick="onSignInWithProvider('google')">Sign in with Google</TextButton>
-        <TextButton :onClick="onSignInWithProvider('github')">Sign in with GitHub</TextButton>
-        <TextButton :onClick="() => {}">Sign in with Facebook</TextButton>
+        <TextButton @click="onSignInWithProvider('google')">Sign in with Google</TextButton>
+        <TextButton @click="onSignInWithProvider('github')">Sign in with GitHub</TextButton>
+        <TextButton>Sign in with Facebook</TextButton>
     </section>
 </template>
 
