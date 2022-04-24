@@ -12,11 +12,11 @@
 
     watch(
         () => userStore.isUserSignedIn,
-        (isSignedIn) => {
+        isSignedIn => {
             if (!isSignedIn) {
                 router.replace({ name: "SignIn" });
             }
-        },
+        }
     );
 </script>
 
@@ -35,7 +35,9 @@
 
 <style lang="scss">
     #app {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+            "Segoe UI Symbol";
         height: 100vh;
         background-color: $surface;
     }
@@ -67,6 +69,7 @@
 
         > #screen {
             flex-grow: 1;
+            overflow: hidden;
             padding: 1rem 8%;
             display: flex;
             flex-direction: column;

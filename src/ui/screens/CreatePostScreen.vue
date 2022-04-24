@@ -22,9 +22,8 @@
             <form action="#" @submit.prevent="">
                 <section class="post-body">
                     <textarea
-                        placeholder="Type what you are thinking aboout…"
+                        placeholder="Type what you are thinking about…"
                         id="post-body"
-                        type="text"
                         v-model="post.body"
                     ></textarea>
                     <div class="post-body-actions">
@@ -43,7 +42,7 @@
                     <OutlinedTextButton @click="onCancel"
                         >Cancel</OutlinedTextButton
                     >
-                    <TextButton id="signup-button">Sign Up</TextButton>
+                    <TextButton id="signup-button">Post</TextButton>
                 </section>
             </form>
         </div>
@@ -58,7 +57,7 @@
         height: 20rem;
         resize: none;
         padding: 0.7rem;
-        
+
         &:focus {
             outline: none;
         }
@@ -86,7 +85,6 @@
     .post-body-actions {
         background-color: lighten($surfaceVariant, 20%);
         border-radius: inherit;
-        padding: 0.5rem;
         display: flex;
         align-items: center;
         padding: 0.6rem 1rem;

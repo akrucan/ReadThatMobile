@@ -1,11 +1,11 @@
 <script setup lang="ts">
     const emit = defineEmits<{
-        (e: "click"): void
+        (e: "click"): void;
     }>();
 </script>
 
 <template>
-    <button type="submit" @click.prevent="emit('click')">
+    <button type="submit" @click="emit('click')">
         <slot></slot>
     </button>
 </template>
