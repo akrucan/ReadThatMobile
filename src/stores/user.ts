@@ -15,7 +15,7 @@ export type AuthProvider = "facebook" | "google" | "github";
 
 export const useUserStore = defineStore("user", () => {
     const firebaseStore = useFirebaseStore();
-    const auth = reactive(getAuth(firebaseStore.app));
+    const auth = getAuth(firebaseStore.app);
 
     const isUserSignedIn: Ref<boolean | null> = ref(null);
     const userProfile: Ref<UserInfo | null> = ref(null);
@@ -63,6 +63,7 @@ export const useUserStore = defineStore("user", () => {
             case "google":
                 _provider = new GoogleAuthProvider();
                 break;
+            
         }
 
         try {
