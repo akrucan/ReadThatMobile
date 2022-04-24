@@ -20,6 +20,11 @@ const router = createRouter({
             path: "/signup",
             name: "SignUp",
             component: () => import("./ui/screens/SignUpScreen.vue")
+        },
+                {
+            path: "/createpost",
+            name: "CreatePost",
+            component: () => import("./ui/screens/CreatePostScreen.vue")
         }
     ],
 });
