@@ -48,7 +48,8 @@
                 <TextButton id="signin-button">Sign In</TextButton>
             </form>
 
-            <p id="signup-text">Don't have an account?
+            <p id="signup-text">
+                Don't have an account?
                 <router-link
                     id="signup-link"
                     :to="{ name: 'SignUp', replace: true }"
@@ -60,8 +61,12 @@
     </section>
 
     <section id="alternative-signup-methods">
-        <TextButton @click="onSignInWithProvider('google')">Sign in with Google</TextButton>
-        <TextButton @click="onSignInWithProvider('github')">Sign in with GitHub</TextButton>
+        <TextButton @click="onSignInWithProvider('google')"
+            >Sign in with Google</TextButton
+        >
+        <TextButton @click="onSignInWithProvider('github')"
+            >Sign in with GitHub</TextButton
+        >
     </section>
 </template>
 

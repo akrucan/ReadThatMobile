@@ -17,12 +17,17 @@
     async function onSignUp() {
         const cred = toRaw(credentials);
 
-        const emailRegex = /[a-z\d][a-z\d-_.]*[a-z\d]+@[a-z\d][a-z\d-_.]*[a-z\d]\.[a-z]{2,}/gi;
+        const emailRegex =
+            /[a-z\d][a-z\d-_.]*[a-z\d]+@[a-z\d][a-z\d-_.]*[a-z\d]\.[a-z]{2,}/gi;
         if (!emailRegex.test(cred.email)) return;
         if (cred.nickname.length < 3) return;
         if (cred.password.length < 8) return;
 
-        const isSuccess = await userStore.signUpWithEmail(cred.email, cred.nickname, cred.password);
+        const isSuccess = await userStore.signUpWithEmail(
+            cred.email,
+            cred.nickname,
+            cred.password
+        );
         if (isSuccess) {
             await router.replace({ name: "Home" });
         }
@@ -61,11 +66,9 @@
         </div>
     </section>
 
-    <p id="signin-text">Already have an account?
-        <router-link
-            id="signin-link"
-            :to="{ name: 'SignIn', replace: true }"
-        >
+    <p id="signin-text">
+        Already have an account?
+        <router-link id="signin-link" :to="{ name: 'SignIn', replace: true }">
             Sign In
         </router-link>
     </p>
