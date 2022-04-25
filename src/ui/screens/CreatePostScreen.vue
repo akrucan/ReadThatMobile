@@ -9,9 +9,14 @@
     const router = useRouter();
     const postStore = usePostsStore();
 
-    const post = reactive({
+    const post: {
+        title: string;
+        body: string;
+        image: File | null;
+    } = reactive({
         title: "",
         body: "",
+        image: null,
     });
 
     async function createPost() {
@@ -19,11 +24,25 @@
         const body = post.body.trim();
         if (title.length == 0 || title.length > 100 || body.length == 0) return;
 
-        const isSuccess = await postStore.createPost({ title, body });
+        const isSuccess = await postStore.createPost({
+            title,
+            body,
+            image: post.image,
+        });
 
         if (isSuccess) {
             await router.replace({ name: "Home" });
         }
+    }
+
+    function addPhoto() {
+        const input = document.createElement("input") as HTMLInputElement;
+        input.type = "file";
+        input.accept = "image/jpeg";
+        input.oninput = () => {
+            post.image = input.files!![0];
+        };
+        input.click();
     }
 
     function onCancel() {
@@ -42,7 +61,13 @@
                 v-model.trim="post.body"
             ></textarea>
             <div id="post-body-actions">
-                <span class="material-icons">photo_camera</span>
+                <input
+                    type="hidden"
+                    accept="image/jpeg;image/png;image/x-png"
+                />
+                <span class="material-icons" @click="addPhoto()"
+                    >photo_camera</span
+                >
                 <span class="material-icons">map</span>
             </div>
         </section>
@@ -92,7 +117,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        gap: 0.9rem
+        gap: 0.9rem;
     }
 
     #post-body-actions {

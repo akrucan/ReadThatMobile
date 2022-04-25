@@ -13,6 +13,7 @@ import {
     updateDoc,
     Timestamp,
 } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { defineStore } from "pinia";
 import { useFirebaseStore } from "./firebase";
 import { useUserStore } from "./user";
@@ -23,6 +24,7 @@ export const usePostsStore = defineStore("firestore", () => {
     const firebaseStore = useFirebaseStore();
     const userStore = useUserStore();
     const db = firebaseStore.db;
+    const storage = firebaseStore.storage;
 
     const postsCollection = collection(db, "posts");
 
@@ -31,13 +33,18 @@ export const usePostsStore = defineStore("firestore", () => {
         if (user === null) return false;
 
         try {
-            await addDoc(postsCollection, {
+            const postRef = await addDoc(postsCollection, {
                 uid: user.uid,
                 title: post.title,
                 body: post.body,
                 timestamp: Timestamp.now(),
                 likes: [],
             } as PostEntity);
+
+            if (post.image == null) return true;
+
+            const imageRef = ref(storage, `postImages/${postRef.id}.jpeg`);
+            await uploadBytes(imageRef, post.image);
 
             return true;
         } catch (e) {
@@ -62,6 +69,15 @@ export const usePostsStore = defineStore("firestore", () => {
                     const user = await tx
                         .get(doc(db, "users", post.uid))
                         .then(userSnapshot => userSnapshot.data() as User);
+                    let imageURL: string | null = null;
+                    try {
+                        const imageStorageURL = `postImages/${postSnapshot.id}.jpeg`;
+                        const imageRef = ref(storage, imageStorageURL);
+                        imageURL = await getDownloadURL(imageRef);
+                    } catch (e) {
+                        console.log(e);
+                    }
+
                     return {
                         id: postSnapshot.id,
                         author: user,
@@ -72,6 +88,7 @@ export const usePostsStore = defineStore("firestore", () => {
                         didUserLike: post.likes.includes(
                             userStore.userProfile!!.uid
                         ),
+                        imageURL,
                     } as Post;
                 })
             )

@@ -12,6 +12,7 @@
 
     onBeforeMount(() => {
         postsStore.getPosts().then(posts => {
+            console.log(posts);
             state.posts = posts;
         });
     });
