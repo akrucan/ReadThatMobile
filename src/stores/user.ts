@@ -106,7 +106,11 @@ export const useUserStore = defineStore("user", () => {
             const user = await signInWithPopup(auth, _provider).then(
                 cred => cred.user
             );
-            await setDoc(doc(db, "users", user.uid), user as UserEntity);
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+            } as UserEntity);
 
             return true;
         } catch (e) {
