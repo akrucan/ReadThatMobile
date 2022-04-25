@@ -50,7 +50,11 @@ export const useUserStore = defineStore("user", () => {
                 email,
                 password
             ).then(cred => cred.user);
-            await updateProfile(user, { displayName: nickname });
+            await updateProfile(user, {
+                displayName: nickname,
+                photoURL:
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/150px-Placeholder_no_text.svg.png",
+            });
 
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
