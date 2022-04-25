@@ -35,7 +35,7 @@ export const useUserStore = defineStore("user", () => {
             })
             .then(snapshot => {
                 if (snapshot == null) return null;
-                return snapshot.data()!! as UserEntity as User;
+                return snapshot.data() as User;
             });
     }
 

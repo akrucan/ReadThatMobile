@@ -6,6 +6,9 @@ export interface NewPost {
 }
 
 export interface Post extends NewPost {
+    readonly id: string;
     readonly author: User;
     readonly date: Date;
+    likeAmount: number;
+    didUserLike: boolean;
 }

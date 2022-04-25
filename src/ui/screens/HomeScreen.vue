@@ -1,19 +1,34 @@
 <script setup lang="ts">
-    import { reactive } from "vue";
+    import { onBeforeMount, reactive } from "vue";
     import { usePostsStore } from "../../stores/posts";
     import { Post } from "../../model/Post";
     import { useDateFormat } from "@vueuse/core";
 
     const postsStore = usePostsStore();
 
-    const state: { posts: Array<Post> } = reactive({
+    const state: { posts: Post[] } = reactive({
         posts: [],
     });
 
-    postsStore.getPosts().then(posts => {
-        console.log(posts);
-        state.posts = posts;
+    onBeforeMount(() => {
+        postsStore.getPosts().then(posts => {
+            state.posts = posts;
+        });
     });
+
+    async function likePost(post: Post) {
+        if (post.didUserLike) {
+            if (await postsStore.dislikePost(post.id)) {
+                post.likeAmount--;
+                post.didUserLike = false;
+            }
+        } else {
+            if (await postsStore.likePost(post.id)) {
+                post.likeAmount++;
+                post.didUserLike = true;
+            }
+        }
+    }
 </script>
 
 <template>
@@ -33,12 +48,21 @@
                 <p>{{ post.body }}</p>
             </div>
             <div class="post-actions">
-                <span class="material-icons">favorite_outlined</span>
+                <span style="margin-bottom: 2px; margin-right: 3px">{{
+                    post.likeAmount
+                }}</span>
+                <span class="material-icons" @click="likePost(post)">{{
+                    post.didUserLike ? "favorite" : "favorite_outlined"
+                }}</span>
                 <div style="flex-grow: 1"></div>
                 <span class="post-author-username">{{
                     post.author.displayName
                 }}</span>
-                <img class="post-author-photo" :src="post.author.photoURL" alt="" />
+                <img
+                    class="post-author-photo"
+                    :src="post.author.photoURL"
+                    alt=""
+                />
             </div>
         </section>
     </main>

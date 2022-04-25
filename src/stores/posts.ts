@@ -1,17 +1,23 @@
 import { NewPost, Post } from "../model/Post";
 import {
     addDoc,
+    arrayRemove,
+    arrayUnion,
     collection,
+    doc,
     getDocs,
     limit,
     orderBy,
     query,
+    runTransaction,
+    updateDoc,
     Timestamp,
 } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { useFirebaseStore } from "./firebase";
 import { useUserStore } from "./user";
 import { PostEntity } from "../firebase/entities";
+import { User } from "../model/User";
 
 export const usePostsStore = defineStore("firestore", () => {
     const firebaseStore = useFirebaseStore();
@@ -30,6 +36,7 @@ export const usePostsStore = defineStore("firestore", () => {
                 title: post.title,
                 body: post.body,
                 timestamp: Timestamp.now(),
+                likes: [],
             } as PostEntity);
 
             return true;
@@ -45,25 +52,60 @@ export const usePostsStore = defineStore("firestore", () => {
             limit(10),
             orderBy("timestamp", "desc")
         );
-        const postsSnapshot = await getDocs(postsQuery);
+        const postsQuerySnapshot = await getDocs(postsQuery);
 
         return Promise.all(
-            postsSnapshot.docs.map(async postSnapshot => {
-                const data = postSnapshot.data() as PostEntity;
-                const user = (await userStore.getUser(data.uid))!!;
-
-                return {
-                    author: user,
-                    title: data.title,
-                    body: data.body,
-                    date: new Date(data.timestamp.seconds * 1000),
-                } as Post;
-            })
+            postsQuerySnapshot.docs.map(postsSnapshot =>
+                runTransaction(db, async tx => {
+                    const postSnapshot = await tx.get(postsSnapshot.ref);
+                    const post = postSnapshot.data() as PostEntity;
+                    const user = await tx
+                        .get(doc(db, "users", post.uid))
+                        .then(userSnapshot => userSnapshot.data() as User);
+                    return {
+                        id: postSnapshot.id,
+                        author: user,
+                        title: post.title,
+                        body: post.body,
+                        date: new Date(post.timestamp.seconds * 1000),
+                        likeAmount: post.likes.length,
+                        didUserLike: post.likes.includes(
+                            userStore.userProfile!!.uid
+                        ),
+                    } as Post;
+                })
+            )
         );
+    }
+
+    async function likePost(postID: string): Promise<boolean> {
+        const postRef = doc(db, "posts", postID);
+        const likes = arrayUnion(userStore.userProfile!!.uid);
+        try {
+            await updateDoc(postRef, "likes", likes);
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    }
+
+    async function dislikePost(postID: string): Promise<boolean> {
+        const postRef = doc(db, "posts", postID);
+        const likes = arrayRemove(userStore.userProfile!!.uid);
+        try {
+            await updateDoc(postRef, "likes", likes);
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
     }
 
     return {
         createPost,
         getPosts,
+        likePost,
+        dislikePost,
     };
 });
