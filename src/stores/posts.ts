@@ -1,27 +1,69 @@
+import { NewPost, Post } from "../model/Post";
 import {
-    getFirestore,
+    addDoc,
     collection,
     getDocs,
-    query,
     limit,
+    orderBy,
+    query,
+    Timestamp,
 } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { useFirebaseStore } from "./firebase";
-import { Post } from "../models/Post";
+import { useUserStore } from "./user";
+import { PostEntity } from "../firebase/entities";
 
 export const usePostsStore = defineStore("firestore", () => {
     const firebaseStore = useFirebaseStore();
-    const db = getFirestore(firebaseStore.app);
+    const userStore = useUserStore();
+    const db = firebaseStore.db;
 
-    const postsCollection = collection(db, "Posts");
+    const postsCollection = collection(db, "posts");
 
-    async function getPosts() {
-        const postsQuery = query(postsCollection, limit(10));
+    async function createPost(post: NewPost): Promise<boolean> {
+        const user = userStore.userProfile;
+        if (user === null) return false;
+
+        try {
+            await addDoc(postsCollection, {
+                uid: user.uid,
+                title: post.title,
+                body: post.body,
+                timestamp: Timestamp.now(),
+            } as PostEntity);
+
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+
+    async function getPosts(): Promise<Post[]> {
+        const postsQuery = query(
+            postsCollection,
+            limit(10),
+            orderBy("timestamp", "desc")
+        );
         const postsSnapshot = await getDocs(postsQuery);
-        return postsSnapshot.docs.map(snapshot => new Post(snapshot.data()));
+
+        return Promise.all(
+            postsSnapshot.docs.map(async postSnapshot => {
+                const data = postSnapshot.data() as PostEntity;
+                const user = (await userStore.getUser(data.uid))!!;
+
+                return {
+                    author: user,
+                    title: data.title,
+                    body: data.body,
+                    date: new Date(data.timestamp.seconds * 1000),
+                } as Post;
+            })
+        );
     }
 
     return {
+        createPost,
         getPosts,
     };
 });

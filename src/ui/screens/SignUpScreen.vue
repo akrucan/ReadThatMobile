@@ -1,9 +1,9 @@
 <script setup lang="ts">
+    import TextButton from "../components/TextButton.vue";
+    import TextField from "../components/TextField.vue";
     import { reactive, toRaw } from "vue";
     import { useRouter } from "vue-router";
     import { useUserStore } from "../../stores/user";
-    import TextButton from "../components/TextButton.vue";
-    import TextField from "../components/TextField.vue";
 
     const router = useRouter();
     const userStore = useUserStore();
@@ -80,12 +80,14 @@
     }
 
     h1 {
+        padding: 0 1rem;
         font-size: 1.5rem;
         letter-spacing: 1px;
         font-weight: 400;
     }
 
     #signup-form {
+        padding: 0 1rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
@@ -110,6 +112,7 @@
     }
 
     #signin-text {
+        padding: 0 1rem;
         font-weight: 500;
         text-align: center;
         margin-bottom: 5rem;

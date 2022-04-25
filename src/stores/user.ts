@@ -1,35 +1,43 @@
+import { Ref, ref } from "vue";
+import { User } from "../model/User";
+import { UserEntity } from "../firebase/entities";
 import { defineStore } from "pinia";
-import { Ref, ref, watch } from "vue";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useFirebaseStore } from "./firebase";
 import {
-    getAuth,
     createUserWithEmailAndPassword,
-    updateProfile,
-    signInWithPopup,
-    UserInfo,
     GithubAuthProvider,
     GoogleAuthProvider,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    updateProfile,
 } from "firebase/auth";
-import { useFirebaseStore } from "./firebase";
 
 export type AuthProvider = "google" | "github";
 
 export const useUserStore = defineStore("user", () => {
     const firebaseStore = useFirebaseStore();
-    const auth = getAuth(firebaseStore.app);
+    const auth = firebaseStore.auth;
+    const db = firebaseStore.db;
 
     const isUserSignedIn: Ref<boolean | null> = ref(null);
-    const userProfile: Ref<UserInfo | null> = ref(null);
+    const userProfile: Ref<User | null> = ref(null);
     auth.onAuthStateChanged(user => {
         isUserSignedIn.value = !!user;
-        userProfile.value = user;
+        userProfile.value = user as User;
     });
 
-    watch(
-        () => auth.currentUser,
-        user => {
-            console.log(user);
-        }
-    );
+    async function getUser(uid: string): Promise<User | null> {
+        return getDoc(doc(db, "users", uid))
+            .catch(e => {
+                console.log(e);
+                return null;
+            })
+            .then(snapshot => {
+                if (snapshot == null) return null;
+                return snapshot.data()!! as UserEntity as User;
+            });
+    }
 
     async function signUpWithEmail(
         email: string,
@@ -42,14 +50,43 @@ export const useUserStore = defineStore("user", () => {
                 email,
                 password
             ).then(cred => cred.user);
-
             await updateProfile(user, { displayName: nickname });
+
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                displayName: nickname,
+                photoURL:
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/150px-Placeholder_no_text.svg.png",
+            } as UserEntity);
+
+            return true;
         } catch (e) {
             console.log(e);
             return false;
         }
+    }
 
-        return true;
+    async function signInWithEmail(
+        email: string,
+        password: string
+    ): Promise<boolean> {
+        try {
+            const user = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            ).then(cred => cred.user);
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+            } as UserEntity);
+
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
     }
 
     async function signInWithProvider(
@@ -66,19 +103,24 @@ export const useUserStore = defineStore("user", () => {
         }
 
         try {
-            await signInWithPopup(auth, _provider);
+            const user = await signInWithPopup(auth, _provider).then(
+                cred => cred.user
+            );
+            await setDoc(doc(db, "users", user.uid), user as UserEntity);
+
+            return true;
         } catch (e) {
             console.log(e);
             return false;
         }
-
-        return true;
     }
 
     return {
+        getUser,
         isUserSignedIn,
-        signUpWithEmail,
+        signInWithEmail,
         signInWithProvider,
+        signUpWithEmail,
         userProfile,
     };
 });

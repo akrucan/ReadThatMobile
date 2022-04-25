@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import { reactive, toRaw } from "vue";
-    import { AuthProvider, useUserStore } from "../../stores/user";
-    import { useRouter } from "vue-router";
-    import TextField from "../components/TextField.vue";
     import TextButton from "../components/TextButton.vue";
+    import TextField from "../components/TextField.vue";
+    import { AuthProvider, useUserStore } from "../../stores/user";
+    import { reactive } from "vue";
+    import { useRouter } from "vue-router";
 
     const router = useRouter();
     const userStore = useUserStore();
@@ -13,8 +13,15 @@
         password: "",
     });
 
-    function onSignIn() {
-        console.log(toRaw(credentials));
+    async function onSignIn() {
+        const isSuccess = await userStore.signInWithEmail(
+            credentials.email,
+            credentials.password
+        );
+
+        if (isSuccess) {
+            router.replace({ name: "Home" }).then();
+        }
     }
 
     async function onSignInWithProvider(provider: AuthProvider) {
@@ -62,11 +69,11 @@
 
     <section id="alternative-signup-methods">
         <TextButton @click="onSignInWithProvider('google')"
-            >Sign in with Google</TextButton
-        >
+            >Sign in with Google
+        </TextButton>
         <TextButton @click="onSignInWithProvider('github')"
-            >Sign in with GitHub</TextButton
-        >
+            >Sign in with GitHub
+        </TextButton>
     </section>
 </template>
 
@@ -76,12 +83,14 @@
     }
 
     h1 {
+        padding: 0 1rem;
         font-size: 1.5rem;
         letter-spacing: 1px;
         font-weight: 400;
     }
 
     #signin-form {
+        padding: 0 1rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
@@ -119,6 +128,7 @@
     }
 
     #alternative-signup-methods {
+        padding: 0 1rem;
         display: flex;
         flex-direction: column;
         align-items: center;

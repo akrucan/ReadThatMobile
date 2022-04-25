@@ -19,7 +19,7 @@
         width: fit-content;
         border-radius: 24px;
         font-weight: 500;
-        padding: 0.5rem 1rem;
+        padding: calc(0.35rem - 1px) calc(1.3rem - 1px);
 
         &:hover {
             cursor: pointer;

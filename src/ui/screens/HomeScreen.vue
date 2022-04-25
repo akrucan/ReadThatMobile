@@ -1,26 +1,44 @@
 <script setup lang="ts">
-    import { usePostsStore } from "../../stores/posts";
     import { reactive } from "vue";
+    import { usePostsStore } from "../../stores/posts";
+    import { Post } from "../../model/Post";
+    import { useDateFormat } from "@vueuse/core";
 
     const postsStore = usePostsStore();
-    const state: { posts: Array<any> } = reactive({
+
+    const state: { posts: Array<Post> } = reactive({
         posts: [],
     });
-    postsStore.getPosts().then(posts => (state.posts = posts));
+
+    postsStore.getPosts().then(posts => {
+        console.log(posts);
+        state.posts = posts;
+    });
 </script>
 
 <template>
     <router-link :to="{ name: 'CreatePost' }"
-        >Type what you are thinking about…</router-link
-    >
+        >Type what you are thinking about…
+    </router-link>
     <main id="posts">
         <section class="post" v-for="post in state.posts">
-            <div class="post-metadata">
-                <p>{{ post.user }}</p>
-                <p>{{ post.date.toLocaleString() }}</p>
-            </div>
+            <header class="post-header">
+                <span>{{ post.title }}</span>
+                <time :datetime="post.date.toISOString()"
+                    >{{ useDateFormat(post.date, "D.MM.YY").value }}<br />@
+                    {{ useDateFormat(post.date, "HH:mm").value }}
+                </time>
+            </header>
             <div class="post-body">
                 <p>{{ post.body }}</p>
+            </div>
+            <div class="post-actions">
+                <span class="material-icons">favorite_outlined</span>
+                <div style="flex-grow: 1"></div>
+                <span class="post-author-username">{{
+                    post.author.displayName
+                }}</span>
+                <img class="post-author-photo" :src="post.author.photoURL" alt="" />
             </div>
         </section>
     </main>
@@ -42,17 +60,44 @@
     }
 
     #posts {
+        padding: 1rem 0.5rem 2rem 0.5rem;
+        margin-top: 1rem;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
     }
 
     .post {
+        border-radius: 8px;
+        box-shadow: 0 0 10px 5px rgba(black, 0.1);
+        background-color: $surfaceVariant;
+        padding: 0.5rem 0.7rem;
         display: flex;
         flex-direction: column;
+        gap: 1rem;
     }
-    .post-metadata {
+
+    .post-header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+
+        > span {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        > time {
+            font-size: 0.7rem;
+            line-height: 1.2;
+            opacity: 0.75;
+            text-align: end;
+            font-style: italic;
+        }
     }
+
     .post-body > p {
         -webkit-line-clamp: 5;
         line-clamp: 5;
@@ -60,5 +105,28 @@
         overflow: hidden;
         -webkit-box-orient: vertical;
         display: -webkit-box;
+    }
+
+    .post-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+
+        .material-icons {
+            font-size: 20px;
+        }
+
+        .post-author-username {
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .post-author-photo {
+            min-width: 24px;
+            max-width: 24px;
+            min-height: 24px;
+            max-height: 24px;
+            border-radius: 50%;
+        }
     }
 </style>

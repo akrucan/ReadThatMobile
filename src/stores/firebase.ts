@@ -1,9 +1,16 @@
 import { defineStore } from "pinia";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../firebase/config";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-export const useFirebaseStore = defineStore("firebase", {
-    state: () => ({
-        app: initializeApp(firebaseConfig),
-    }),
+export const useFirebaseStore = defineStore("firebase", () => {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app)
+    const db = getFirestore(app);
+
+    return {
+        auth,
+        db
+    }
 });

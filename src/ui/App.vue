@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import { useRegisterSW } from "virtual:pwa-register/vue";
-    import { useUserStore } from "../stores/user";
-    import { useRouter } from "vue-router";
-    import { watch } from "vue";
     import BottomNavigation from "./components/BottomNavigation.vue";
+    import { useRegisterSW } from "virtual:pwa-register/vue";
+    import { useRouter } from "vue-router";
+    import { useUserStore } from "../stores/user";
+    import { watch } from "vue";
 
     useRegisterSW();
 
@@ -24,7 +24,7 @@
     <div id="app-container" v-if="userStore.isUserSignedIn !== null">
         <header>
             <img src="/favicon.ico" alt="" />
-            <h1>ReadThat</h1>
+            <span>ReadThat</span>
         </header>
         <div id="screen">
             <router-view />
@@ -50,16 +50,17 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
 
         > header {
             display: flex;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
 
-            > h1 {
+            > span {
                 font-size: 1rem;
                 letter-spacing: 2px;
+                font-weight: 500;
+                color: #aaaaaa;
             }
 
             > img {
@@ -70,7 +71,7 @@
         > #screen {
             flex-grow: 1;
             overflow: hidden;
-            padding: 1rem 8%;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
         }
