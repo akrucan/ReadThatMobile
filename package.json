@@ -9,6 +9,7 @@
         "https-preview": "serve dist"
     },
     "dependencies": {
+        "@vueuse/core": "^8.3.1",
         "firebase": "^9.6.11",
         "pinia": "^2.0.13",
         "vue": "^3.2.33",
