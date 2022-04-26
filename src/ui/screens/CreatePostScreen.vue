@@ -2,9 +2,10 @@
     import OutlinedTextButton from "../components/OutlinedTextButton.vue";
     import TextButton from "../components/TextButton.vue";
     import TextField from "../components/TextField.vue";
-    import { reactive } from "vue";
+    import { reactive, computed } from "vue";
     import { usePostsStore } from "../../stores/posts";
     import { useRouter } from "vue-router";
+    import { useGeolocation } from "@vueuse/core";
 
     const router = useRouter();
     const postStore = usePostsStore();
@@ -13,10 +14,16 @@
         title: string;
         body: string;
         image: File | null;
+        location: string | null;
     } = reactive({
         title: "",
         body: "",
         image: null,
+        location: null,
+    });
+
+    const imgURL = computed(() => {
+        return post.image === null ? null : URL.createObjectURL(post.image);
     });
 
     async function createPost() {
@@ -45,6 +52,30 @@
         input.click();
     }
 
+    var options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+    };
+
+    function addLocation() {
+        const { coords, error } = useGeolocation();
+        navigator.geolocation.getCurrentPosition(showPosition);
+    }
+
+    async function showPosition(position) {
+            const api_url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${{coords.latitude}}&longitude=${{coords.longitude}}&localityLanguage=en'
+            const response = await fetch(api_url);
+            const data = await response.json();
+            const { city } = data;
+            console.log(data.city + ", " + data.countryCode);
+            post.location = data.city + ", " + data.countryCode;
+        }
+
+    function deletePhoto() {
+        post.image = null;
+    }
+
     function onCancel() {
         router.replace({ name: "Home" });
     }
@@ -60,6 +91,12 @@
                 placeholder="Type what you are thinking about…"
                 v-model.trim="post.body"
             ></textarea>
+            <div v-if="imgURL !== null" id="post-image-bar">
+                <img id="post-image" :src="`${imgURL}`" />
+                <span class="material-icons" @click="deletePhoto()"
+                    >delete</span
+                >
+            </div>
             <div id="post-body-actions">
                 <input
                     type="hidden"
@@ -68,7 +105,7 @@
                 <span class="material-icons" @click="addPhoto()"
                     >photo_camera</span
                 >
-                <span class="material-icons">map</span>
+                <span class="material-icons" @click="addLocation()">map</span>
             </div>
         </section>
         <section id="button-row">
@@ -118,6 +155,12 @@
         flex-direction: column;
         overflow: hidden;
         gap: 0.9rem;
+    }
+
+    #post-image {
+        max-height: 100px;
+        max-width: 100%;
+        border: solid 2px black;
     }
 
     #post-body-actions {

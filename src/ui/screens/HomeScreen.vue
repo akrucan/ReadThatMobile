@@ -48,6 +48,9 @@
             <div class="post-body">
                 <p>{{ post.body }}</p>
             </div>
+            <div v-if="post.imageURL !== null" class="post-image">
+                <img :src="`${post.imageURL}`"/>
+            </div>
             <div class="post-actions">
                 <span style="margin-bottom: 2px; margin-right: 3px">{{
                     post.likeAmount
@@ -132,6 +135,11 @@
         display: -webkit-box;
     }
 
+    .post-image {
+        display: flex;
+        width: fit-content;
+        object-fit: cover;
+    }
     .post-actions {
         display: flex;
         align-items: center;
