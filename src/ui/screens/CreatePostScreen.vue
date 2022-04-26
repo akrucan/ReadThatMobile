@@ -63,11 +63,10 @@
         navigator.geolocation.getCurrentPosition(showPosition);
     }
 
-    async function showPosition(position) {
+    async function showPosition() {
             const api_url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${{coords.latitude}}&longitude=${{coords.longitude}}&localityLanguage=en'
             const response = await fetch(api_url);
             const data = await response.json();
-            const { city } = data;
             console.log(data.city + ", " + data.countryCode);
             post.location = data.city + ", " + data.countryCode;
         }
