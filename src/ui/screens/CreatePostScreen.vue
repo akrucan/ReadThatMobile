@@ -183,6 +183,10 @@
         padding: 1rem;
         align-items: center;
         gap: 1rem;
+        
+        > section {
+            display: flex;
+        }
     }
 
     #post-body-actions {
