@@ -12,4 +12,5 @@ export interface PostEntity {
     readonly body: string;
     readonly timestamp: Timestamp;
     readonly likes: string[];
+    readonly location: string | null;
 }

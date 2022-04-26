@@ -45,11 +45,14 @@
                     {{ useDateFormat(post.date, "HH:mm").value }}
                 </time>
             </header>
+            <div class="location-header">
+                <span>{{ post.location }}</span>
+            </div>
             <div class="post-body">
                 <p>{{ post.body }}</p>
             </div>
             <div v-if="post.imageURL !== null" class="post-image">
-                <img :src="`${post.imageURL}`"/>
+                <img :src="`${post.imageURL}`" />
             </div>
             <div class="post-actions">
                 <span style="margin-bottom: 2px; margin-right: 3px">{{
@@ -126,6 +129,15 @@
         }
     }
 
+    .location-header {
+        display: flex;
+        
+        > span {
+            font-size: 0.8rem;
+            font-weight: 500;
+            line-height: 0;
+        }
+    }
     .post-body > p {
         -webkit-line-clamp: 5;
         line-clamp: 5;

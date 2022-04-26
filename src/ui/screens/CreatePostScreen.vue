@@ -5,7 +5,6 @@
     import { reactive, computed } from "vue";
     import { usePostsStore } from "../../stores/posts";
     import { useRouter } from "vue-router";
-    import { useGeolocation } from "@vueuse/core";
 
     const router = useRouter();
     const postStore = usePostsStore();
@@ -35,6 +34,7 @@
             title,
             body,
             image: post.image,
+            location: post.location,
         });
 
         if (isSuccess) {
@@ -59,20 +59,28 @@
     };
 
     function addLocation() {
-        const { coords, error } = useGeolocation();
-        navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(showPosition, error);
     }
 
     async function showPosition() {
-            const api_url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${{coords.latitude}}&longitude=${{coords.longitude}}&localityLanguage=en'
-            const response = await fetch(api_url);
-            const data = await response.json();
-            console.log(data.city + ", " + data.countryCode);
-            post.location = data.city + ", " + data.countryCode;
-        }
+        const api_url =
+            "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${{coords.latitude}}&longitude=${{coords.longitude}}&localityLanguage=en";
+        const response = await fetch(api_url);
+        const data = await response.json();
+        console.log(data.city + ", " + data.countryCode);
+        post.location = data.city + ", " + data.countryCode;
+    }
+
+    function error(err: any) {
+        console.log(`(${err.code}): ${err.message}`);
+    }
 
     function deletePhoto() {
         post.image = null;
+    }
+
+    function deleteLocation() {
+        post.location = null;
     }
 
     function onCancel() {
@@ -90,11 +98,19 @@
                 placeholder="Type what you are thinking about…"
                 v-model.trim="post.body"
             ></textarea>
-            <div v-if="imgURL !== null" id="post-image-bar">
-                <img id="post-image" :src="`${imgURL}`" />
-                <span class="material-icons" @click="deletePhoto()"
-                    >delete</span
-                >
+            <div id="post-image-location-bar">
+                <section v-if="imgURL !== null">
+                    <img id="post-image" :src="`${imgURL}`" />
+                    <span class="material-icons" @click="deletePhoto()"
+                        >delete</span
+                    >
+                </section>
+                <section v-if="post.location !== null">
+                    <p>{{ post.location }}</p>
+                    <span class="material-icons" @click="deleteLocation()"
+                        >delete</span
+                    >
+                </section>
             </div>
             <div id="post-body-actions">
                 <input
@@ -138,7 +154,7 @@
         background-color: transparent;
         border: none;
         width: 100%;
-        height: 20rem;
+        height: 15rem;
         resize: none;
         padding: 0.7rem;
 
@@ -157,9 +173,16 @@
     }
 
     #post-image {
-        max-height: 100px;
+        max-height: 80px;
         max-width: 100%;
         border: solid 2px black;
+    }
+
+    #post-image-location-bar {
+        display: flex;
+        padding: 1rem;
+        align-items: center;
+        gap: 1rem;
     }
 
     #post-body-actions {
