@@ -39,15 +39,18 @@
     <main id="posts">
         <section class="post" v-for="post in state.posts">
             <header class="post-header">
-                <span>{{ post.title }}</span>
+                <div>
+                    <span>{{ post.title }}</span> <br />
+                    <div v-if="post.location !== null" class="location-header">
+                        <span class="material-icons"> pin_drop </span>
+                        <span>{{ post.location }}</span>
+                    </div>
+                </div>
                 <time :datetime="post.date.toISOString()"
                     >{{ useDateFormat(post.date, "D.MM.YY").value }}<br />@
                     {{ useDateFormat(post.date, "HH:mm").value }}
                 </time>
             </header>
-            <div class="location-header">
-                <span>{{ post.location }}</span>
-            </div>
             <div class="post-body">
                 <p>{{ post.body }}</p>
             </div>
@@ -131,11 +134,13 @@
 
     .location-header {
         display: flex;
-        
+        align-items: center;
+        gap: 0.1rem;
+
         > span {
-            font-size: 0.8rem;
+            font-size: 0.6rem;
             font-weight: 500;
-            line-height: 0;
+            align-content: center;
         }
     }
     .post-body > p {
