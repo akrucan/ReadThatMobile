@@ -24,7 +24,7 @@
         if (isSuccess) {
             router.replace({ name: "Home" }).then();
         } else {
-            toast.error("Wrong password");
+            toast.error("Wrong email or password");
             navigator.vibrate(200);
         }
     }
@@ -33,7 +33,6 @@
         const isSuccess = await userStore.signInWithProvider(provider);
         if (isSuccess) {
             await router.replace({ name: "Home" });
-            toast("Welcome");
             console.log("test");
         }
     }
