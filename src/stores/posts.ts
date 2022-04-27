@@ -12,6 +12,8 @@ import {
     runTransaction,
     updateDoc,
     Timestamp,
+    Query,
+    where,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { defineStore } from "pinia";
@@ -54,12 +56,67 @@ export const usePostsStore = defineStore("firestore", () => {
         }
     }
 
-    async function getPosts(): Promise<Post[]> {
+    async function getUserPosts(uid: string): Promise<Post[]> {
         const postsQuery = query(
             postsCollection,
-            limit(10),
-            orderBy("timestamp", "desc")
+            where("uid", "==", uid),
+            orderBy("timestamp", "desc"),
+            limit(10)
         );
+        const postsQuerySnapshot = await getDocs(postsQuery);
+
+        return Promise.all(
+            postsQuerySnapshot.docs.map(postsSnapshot =>
+                runTransaction(db, async tx => {
+                    const postSnapshot = await tx.get(postsSnapshot.ref);
+                    const post = postSnapshot.data() as PostEntity;
+                    const user = await tx
+                        .get(doc(db, "users", post.uid))
+                        .then(userSnapshot => userSnapshot.data() as User);
+                    let imageURL: string | null = null;
+                    try {
+                        const imageStorageURL = `postImages/${postSnapshot.id}.jpeg`;
+                        const imageRef = ref(storage, imageStorageURL);
+                        imageURL = await getDownloadURL(imageRef);
+                    } catch (e) {
+                        console.log(e);
+                    }
+
+                    return {
+                        id: postSnapshot.id,
+                        author: user,
+                        title: post.title,
+                        body: post.body,
+                        date: new Date(post.timestamp.seconds * 1000),
+                        likeAmount: post.likes.length,
+                        didUserLike: post.likes.includes(
+                            userStore.userProfile!!.uid
+                        ),
+                        imageURL,
+                        location: post.location,
+                    } as Post;
+                })
+            )
+        );
+    }
+
+    async function getPosts(searchText?: string): Promise<Post[]> {
+        let postsQuery: Query;
+        if (searchText) {
+            postsQuery = query(
+                postsCollection,
+                where("title", ">=", searchText),
+                orderBy("title", "desc"),
+                orderBy("timestamp", "asc"),
+                limit(10)
+            );
+        } else {
+            postsQuery = query(
+                postsCollection,
+                limit(10),
+                orderBy("timestamp", "desc")
+            );
+        }
         const postsQuerySnapshot = await getDocs(postsQuery);
 
         return Promise.all(
@@ -124,6 +181,7 @@ export const usePostsStore = defineStore("firestore", () => {
     return {
         createPost,
         getPosts,
+        getUserPosts,
         likePost,
         dislikePost,
     };
