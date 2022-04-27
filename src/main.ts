@@ -2,6 +2,8 @@ import App from "./ui/App.vue";
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
+import Toast, { PluginOptions, POSITION } from "vue-toastification";
+import "vue-toastification/src/scss/index.scss";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -43,4 +45,12 @@ const router = createRouter({
     ],
 });
 
-createApp(App).use(router).use(createPinia()).mount("#app");
+const toastOptions: PluginOptions = {
+    position: POSITION.BOTTOM_CENTER,
+};
+
+createApp(App)
+    .use(router)
+    .use(createPinia())
+    .use(Toast, toastOptions)
+    .mount("#app");

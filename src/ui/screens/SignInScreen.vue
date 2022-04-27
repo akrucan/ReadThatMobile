@@ -4,7 +4,9 @@
     import { AuthProvider, useUserStore } from "../../stores/user";
     import { reactive } from "vue";
     import { useRouter } from "vue-router";
+    import { useToast } from "vue-toastification";
 
+    const toast = useToast();
     const router = useRouter();
     const userStore = useUserStore();
 
@@ -21,6 +23,9 @@
 
         if (isSuccess) {
             router.replace({ name: "Home" }).then();
+        } else {
+            toast.error("Wrong password");
+            navigator.vibrate(200);
         }
     }
 
@@ -28,6 +33,8 @@
         const isSuccess = await userStore.signInWithProvider(provider);
         if (isSuccess) {
             await router.replace({ name: "Home" });
+            toast("Welcome");
+            console.log("test");
         }
     }
 </script>
