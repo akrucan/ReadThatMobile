@@ -5,7 +5,9 @@
     import { reactive, computed } from "vue";
     import { usePostsStore } from "../../stores/posts";
     import { useRouter } from "vue-router";
+    import { useToast } from "vue-toastification";
 
+    const toast = useToast();
     const router = useRouter();
     const postStore = usePostsStore();
 
@@ -24,18 +26,22 @@
     const imgURL = computed(() => {
         return post.image === null ? null : URL.createObjectURL(post.image);
     });
+    function errorHandler(message: String, duration: number = 200) {
+        toast.error(message);
+        navigator.vibrate(duration);
+    }
 
     async function createPost() {
         const title = post.title.trim();
         const body = post.body.trim();
-        if (
-            title.length == 0 ||
-            title.length > 100 ||
-            body.length == 0 ||
-            body.length > 420
-        )
+        if (title.length == 0) {
+            errorHandler("Title cannot be empty");
             return;
-
+        }
+        if (body.length == 0) {
+            errorHandler("Body cannot be empty");
+            return;
+        }
         const isSuccess = await postStore.createPost({
             title,
             body,
@@ -102,12 +108,14 @@
             <TextField
                 type="text"
                 placeholder="Title"
+                maxlength="100"
                 v-model:value="post.title"
             />
             <section id="post-body-container">
                 <textarea
                     placeholder="Type what you are thinking about…"
                     v-model.trim="post.body"
+                    maxlength="400"
                 ></textarea>
                 <div id="post-image-location-bar">
                     <section v-if="imgURL !== null">
