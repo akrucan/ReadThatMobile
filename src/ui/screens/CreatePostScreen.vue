@@ -28,7 +28,13 @@
     async function createPost() {
         const title = post.title.trim();
         const body = post.body.trim();
-        if (title.length == 0 || title.length > 100 || body.length == 0) return;
+        if (
+            title.length == 0 ||
+            title.length > 100 ||
+            body.length == 0 ||
+            body.length > 420
+        )
+            return;
 
         const isSuccess = await postStore.createPost({
             title,
@@ -89,58 +95,66 @@
 </script>
 
 <template>
-    <h1>Create a new post</h1>
+    <main id="create">
+        <h1>Create a new post</h1>
 
-    <form action="#" @submit.prevent="createPost()">
-        <TextField type="text" placeholder="Title" v-model:value="post.title" />
-        <section id="post-body-container">
-            <textarea
-                placeholder="Type what you are thinking about…"
-                v-model.trim="post.body"
-            ></textarea>
-            <div id="post-image-location-bar">
-                <section v-if="imgURL !== null">
-                    <img id="post-image" :src="`${imgURL}`" />
-                    <span class="material-icons" @click="deletePhoto()"
-                        >delete</span
+        <form action="#" @submit.prevent="createPost()">
+            <TextField
+                type="text"
+                placeholder="Title"
+                v-model:value="post.title"
+            />
+            <section id="post-body-container">
+                <textarea
+                    placeholder="Type what you are thinking about…"
+                    v-model.trim="post.body"
+                ></textarea>
+                <div id="post-image-location-bar">
+                    <section v-if="imgURL !== null">
+                        <img id="post-image" :src="`${imgURL}`" />
+                        <span class="material-icons" @click="deletePhoto()"
+                            >delete</span
+                        >
+                    </section>
+                    <section v-if="post.location !== null">
+                        <p>{{ post.location }}</p>
+                        <span class="material-icons" @click="deleteLocation()"
+                            >delete</span
+                        >
+                    </section>
+                </div>
+                <div id="post-body-actions">
+                    <input
+                        type="hidden"
+                        accept="image/jpeg;image/png;image/x-png"
+                    />
+                    <span class="material-icons" @click="addPhoto()"
+                        >photo_camera</span
                     >
-                </section>
-                <section v-if="post.location !== null">
-                    <p>{{ post.location }}</p>
-                    <span class="material-icons" @click="deleteLocation()"
-                        >delete</span
+                    <span class="material-icons" @click="addLocation()"
+                        >map</span
                     >
-                </section>
-            </div>
-            <div id="post-body-actions">
-                <input
-                    type="hidden"
-                    accept="image/jpeg;image/png;image/x-png"
-                />
-                <span class="material-icons" @click="addPhoto()"
-                    >photo_camera</span
+                </div>
+            </section>
+            <section id="button-row">
+                <div style="flex-grow: 1"></div>
+                <OutlinedTextButton @click="onCancel"
+                    >Cancel</OutlinedTextButton
                 >
-                <span class="material-icons" @click="addLocation()">map</span>
-            </div>
-        </section>
-        <section id="button-row">
-            <router-link
-                id="save-draft-button"
-                :to="{ name: 'Home', replace: true }"
-            >
-                Save as draft
-            </router-link>
-            <div style="flex-grow: 1"></div>
-            <OutlinedTextButton @click="onCancel">Cancel</OutlinedTextButton>
-            <TextButton>Post</TextButton>
-        </section>
-    </form>
+                <TextButton>Post</TextButton>
+            </section>
+        </form>
+    </main>
 </template>
 
 <style scoped lang="scss">
     h1 {
         padding: 0 1rem;
         font-size: 1.5rem;
+    }
+
+    #create {
+        overflow-y: auto;
     }
 
     form {
@@ -183,7 +197,7 @@
         padding: 1rem;
         align-items: center;
         gap: 1rem;
-        
+
         > section {
             display: flex;
         }

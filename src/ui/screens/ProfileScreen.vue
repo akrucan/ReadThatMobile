@@ -50,7 +50,7 @@
 <template>
     <main id="posts">
         <section class="profile-header">
-            <img :src="`${user?.photoURL}`" /><br />
+            <img :src="`${user!!.photoURL}`" /><br />
             <span>{{ user?.displayName }}</span
             ><br />
             <span>{{ user?.email }}</span
@@ -161,14 +161,6 @@
                 font-weight: 500;
                 align-content: center;
             }
-        }
-        .post-body > p {
-            -webkit-line-clamp: 5;
-            line-clamp: 5;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            -webkit-box-orient: vertical;
-            display: -webkit-box;
         }
 
         .post-image {
