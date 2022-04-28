@@ -156,14 +156,6 @@
                 align-content: center;
             }
         }
-        .post-body > p {
-            -webkit-line-clamp: 5;
-            line-clamp: 5;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            -webkit-box-orient: vertical;
-            display: -webkit-box;
-        }
 
         .post-image {
             display: flex;
