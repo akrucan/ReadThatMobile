@@ -25,7 +25,7 @@ export default defineConfig({
             manifest: {
                 name: "Read That",
                 short_name: "Read That",
-                theme_color: "#123456",
+                theme_color: "#1e1e1e",
                 icons: [
                     {
                         src: "pwa-192x192.png",
